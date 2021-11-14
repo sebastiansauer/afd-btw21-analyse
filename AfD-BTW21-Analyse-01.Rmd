@@ -5,9 +5,11 @@ date: "11/12/2021"
 dpi: 300
 output: 
   rmdformats::readthedown:
+    
     #toc: true
     number_sections: true
-    
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r global-knitr-options, include=FALSE}
@@ -32,19 +34,35 @@ output:
 # Hintergrund
 
 
-Die Bundestagswahl ist ein zentrales Ereignis für die Öffentlichkeit in Deutschland. Vor der hohen Relevanz dieses Ereignisses stellt sich die Frage, welche Faktoren die Ursache (oder zumindest Prädiktoren) der Wahlentscheidungen der Bürgerinnen und Bürger sind. Ist beispielsweise die Höhe der Arbeitslosigkeit in einem Wahlkreis ausschlaggebend, dass die eine oder andere Partei gewählt wird?
+Die Bundestagswahl ist ein zentrales Ereignis für die Öffentlichkeit in Deutschland. 
+In Anbetracht der hohen Relevanz dieses Ereignisses stellt sich die Frage, 
+welche Faktoren die Ursache (oder zumindest Prädiktoren) der Wahlentscheidungen der Bürgerinnen und Bürger sind. 
+Ist beispielsweise die Höhe der Arbeitslosigkeit in einem Wahlkreis ausschlaggebend, 
+dass die eine oder andere Partei gewählt wird? 
+Spielt die Altersverteilung eine Rolle? 
+Der Ausländeranteil?
 
-Die Analyse des Wahlerfolgs der Partei "Alternative für Deutschland" (AfD) ist von besonderem Interesse, da ein Teil ihrer Wählis und Vertretis offenbar die Grundsätze deutscher Politik hinterfragt und vielleicht entgegensteht. [So hat das Bundesamt für Verfassungsschutz Teilorganisationen der AfD zum Verdachtsfall für Rechtsextremismus eingestuft](https://www.verfassungsschutz.de/SharedDocs/kurzmeldungen/DE/2019/fachinformation-zu-teilorganisationen-der-afd.html).
+Die Analyse des Wahlerfolgs der Partei "Alternative für Deutschland" (AfD) ist in diesem Zusammenhang von besonderem Interesse, 
+da ein Teil ihrer Wählis und Vertretis offenbar die Grundsätze deutscher Politik hinterfragt und vielleicht entgegensteht. 
+[So hat das Bundesamt für Verfassungsschutz Teilorganisationen der AfD zum Verdachtsfall für Rechtsextremismus eingestuft](https://www.verfassungsschutz.de/SharedDocs/kurzmeldungen/DE/2019/fachinformation-zu-teilorganisationen-der-afd.html).
 
-Die Relevanz der Analyse extremistischer Bewegungen begründet sich mit einem Blick in die deutsche Geschichte: Die (deutsche) Geschichte des 20. Jahrhunderts zeigt, dass rechtsextreme Bewegungen das Potenzial für katastrophale Entwicklungen und schlimmste Verbrechen haben. 
+Die Relevanz der Analyse extremistischer Bewegungen begründet sich mit einem Blick in die deutsche Geschichte: 
+Die (deutsche) Geschichte des 20. Jahrhunderts zeigt,
+dass rechtsextreme Bewegungen das Potenzial für katastrophale Entwicklungen und schlimmste Verbrechen haben. 
 
-Ziel und Gegenstand dieses Workshops ist es nicht, eine Meinung oder ein Urteil über die Einschätzung des Verfassungsschutzes oder der AfD zu treffen. Vielmehr ist vor dem genannten Hintergrund die Analyse, warum bzw. unter welchen Randbedingungen die AfD Stimmen auf sich zieht, von höchstem gesellschaftlichem Interesse. 
+Ziel und Gegenstand dieses Workshops ist es nicht,
+eine Meinung oder ein Urteil über die Einschätzung des Verfassungsschutzes oder der AfD zu treffen. 
+Vielmehr ist vor dem genannten Hintergrund die Analyse, 
+warum bzw. unter welchen Randbedingungen die AfD Stimmen auf sich zieht (bei der Bundestagswahl, BTW, 2021), 
+von (potenziell) hohem gesellschaftlichem Interesse. 
 
 
 
 # Hinweise
 
-Ziel dieser Analyse ist es, grundlegende Methoden der Datenanalyse für eine angewandte Forschungsfrage bzw. eine Forschungsfrage von allgemeinem Interesse, vorzustellen bzw. einzuüben.
+Ziel dieser Analyse ist es, 
+grundlegende Methoden der Datenanalyse für eine angewandte Forschungsfrage bzw. eine Forschungsfrage von allgemeinem Interesse, 
+vorzustellen bzw. einzuüben.
 
 Es handelt sich um eine Analyse mit rein didaktischem Ziel.
 
@@ -54,10 +72,19 @@ Es sind keinerlei politische Aussagen mit dieser Analyse verbunden.
 # Forschungsfragen
 
 
-1. Wie groß ist der AfD-Stimmenanteil, aggregiert pro Bundesland und Deutschlandweit? Wie verteilt sich der Stimmenanteil der AfD?
+1. Bei der BTW 2021, wie groß ist der AfD-Stimmenanteil, 
+aggregiert pro Bundesland und Deutschlandweit? 
+Wie verteilt sich der Stimmenanteil der AfD?
 
-2. Wie hängt der Wahlerfolg der AfD mit ökonomopolitischen Indikatoren wie Arbeitslosigkeitsquote und Ausländeranteil zusammen?
+2. Wie hängt der Wahlerfolg der AfD mit sozioökonomischen Indikatoren wie Arbeitslosigkeitsquote und Ausländeranteil zusammen?
 
+3. Welche Rolle spielen die Besonderheiten der Bundesländer, 
+über die sozioökonomischen Indikatoren im Hinblick auf den Zweitstimmenanteil der AfD?
+
+
+Die Forschungsfragen sind *deskriptiv* in dem Sinne,
+dass sie keine Kausalfragen adressieren, 
+sondern lediglich (statistische) Zusammenhänge.
 
 
 
@@ -67,13 +94,14 @@ Es sind keinerlei politische Aussagen mit dieser Analyse verbunden.
 
 
 ```{r}
-library(tidyverse)
+library(tidyverse)  # Datenjudo
 library(sf)  # Geo-Visualisierung
 library(rstatix)  # Deskriptive Statistiken
 library(corrr)  # Korrelationsmatrizen
 library(gt)  # HTML Tabellen
 library(rstanarm)  # Bayes-Modellierung
-library(tictoc)
+library(tictoc)  # Messung der Rechenzeit
+library(bayesplot)  # Visualisierung von Bays-Modellen
 ```
 
 
@@ -85,13 +113,16 @@ library(tictoc)
 
 ### Daten einlesen
 
-Die Strukturdaten sind vom [Bundeswahlleiter](https://bundeswahlleiter.de/bundestagswahlen/2021/strukturdaten.html) zu beziehen; über [diesen Link](https://bundeswahlleiter.de/dam/jcr/b1d3fc4f-17eb-455f-a01c-a0bf32135c5d/btw21_strukturdaten.csv) kommt man zu den Daten (CSV-Format).
+Die Strukturdaten sind vom [Bundeswahlleiter](https://bundeswahlleiter.de/bundestagswahlen/2021/strukturdaten.html) zu beziehen; 
+über [diesen Link](https://bundeswahlleiter.de/dam/jcr/b1d3fc4f-17eb-455f-a01c-a0bf32135c5d/btw21_strukturdaten.csv) kommt man zu den Daten (CSV-Format).
 
 
 Die Variablennamen sind [hier](https://bundeswahlleiter.de/bundestagswahlen/2021/strukturdaten/beschreibung.html) erklärt.
 
+
+
 ```{r}
-d_str_file <- "data/btw21_Strukturdaten.csv"
+d_str_file <- "https://bundeswahlleiter.de/dam/jcr/b1d3fc4f-17eb-455f-a01c-a0bf32135c5d/btw21_strukturdaten.csv"
 
 d_str <- read_delim(d_str_file,
                     delim = ";", 
@@ -106,10 +137,11 @@ Hier sind die Namen der Spalten:
 
 ```{r}
 names(d_str)
-```
+    ```
 
 
-Es ist vielleicht praktisch, die Spaltennamen für spätere Verwendung in einer Textdatei abzuspeichern:
+Es ist vielleicht praktisch, 
+die Spaltennamen für spätere Verwendung in einer Textdatei abzuspeichern:
 
 ```{r}
 d_str_names <-
@@ -125,7 +157,8 @@ write_csv(d_str_names, "objects/d_str_names.csv")
 
 ### Daten aufbereiten
 
-Die Spaltennamen sind etwas unhandlich. Formulieren wir lieber prägnanter:
+Die Spaltennamen sind etwas unhandlich. 
+Formulieren wir lieber prägnanter:
 
 
 ```{r}
@@ -156,7 +189,8 @@ write_csv(d_str2, file = "objects/d_str2.csv")
 
 ### Daten einlesen
 
-Die Daten sind vom [Bundeswahlleiter](https://bundeswahlleiter.de/bundestagswahlen/2021/ergebnisse/opendata.html#39734920-0eaf-4633-8858-ae792d5d610b) zu beziehen. Unter [diesem Link](https://www.bundeswahlleiter.de/bundestagswahlen/2021/ergebnisse/opendata/csv/kerg2.csv) kommt man direkt zur CSV-Datei.
+Die Daten sind vom [Bundeswahlleiter](https://bundeswahlleiter.de/bundestagswahlen/2021/ergebnisse/opendata.html#39734920-0eaf-4633-8858-ae792d5d610b) zu beziehen. 
+Unter [diesem Link](https://www.bundeswahlleiter.de/bundestagswahlen/2021/ergebnisse/opendata/csv/kerg2.csv) kommt man direkt zur CSV-Datei.
 
 Eine Erklärung zu den Variablen findet sich [hier](https://bundeswahlleiter.de/dam/jcr/f801a6d7-e51f-4804-baa4-dacec780704d/btw21_dsb_kerg2.pdf).
 
@@ -177,7 +211,8 @@ elec_results <- read_delim(elec_results_file,
 
 ### Daten aufbereiten
 
-Konzentrieren wir uns auf die Zweitstimme, da die bei der BTW die entscheidende ist.
+Konzentrieren wir uns auf die Zweitstimme, 
+da die bei der BTW die entscheidende ist.
 
 ```{r}
 elec_results2 <- 
@@ -186,6 +221,12 @@ elec_results2 <-
   filter(Gruppenname == "AfD") %>% 
   filter(Stimme == 2)
 ```
+
+
+Im anderen Datensatz wird "Bundesgebiet" mit "Deutschland" bezeichnet. 
+Um die beiden Datensätze im Weiteren zusammenfügen zu können, 
+sollten jeweils die gleiche Bezeichnung (für das gleiche "Ding", 
+sprich Gesamtdeutschland) verwenden werden:
 
 
 ```{r}
@@ -214,7 +255,8 @@ write_csv(elec_results2, file = "objects/elec_results2.csv")
 
 ### ... über alle Bundesländer
 
-Achtung! Alle Bundesländer werden gleich gewichtet!
+Achtung! 
+Alle Bundesländer werden in der folgenden Analyse gleich gewichtet!
 
 ```{r}
 elec_results2 %>% 
@@ -274,6 +316,11 @@ elec_results2 %>%
 
 # Daten zusammenführen (join)
 
+Mit einem "Join" lassen sich Tabellen zeilenweise zusammenführen.
+[Hier](https://www.garrickadenbuie.com/project/tidyexplain/) findet sich eine nette visuelle Einführung.
+
+Es finden sich viele Tutorials online zu Joins. [Dieses](https://r4ds.had.co.nz/relational-data.html) ist ein empfehlenswertes.
+
 ## Erster Versuch
 
 ```{r}
@@ -293,7 +340,8 @@ Es sind die Bundesländer, deren `area_name` "Land insgesamt", jeweils, lautet.
 
 Diese Felder müssen wir wohl umbenennen.
 
-Bundesländer - plus der Bund als Ganzes - haben eine ID, die mit 9 beginnt, was für sonstige Einheiten nicht der Fall ist:
+Bundesländer - plus der Bund als Ganzes - haben eine ID, die mit 9 beginnt, 
+was für sonstige Einheiten nicht der Fall ist:
 
 
 ```{r}
@@ -306,7 +354,8 @@ d %>%
 ```
 
 
-Da die Länder auch noch noch eine andere Gebietsnummer haben in der Datei mit den Strukturdaten, fügen wir noch die Gebietsnummer aus `elec_results2` hinzu:
+Da die Länder auch noch noch eine andere Gebietsnummer haben in der Datei mit den Strukturdaten, 
+fügen wir noch die Gebietsnummer aus `elec_results2` hinzu:
 
 ```{r}
 d_laender2 <-
@@ -333,7 +382,9 @@ d_str3 <-
 ```
 
 
-`area_name.y` ist aktuell nur mit Landesnamen (plus Bund) gefüllt. Ergänzen wir also die `NA`s mit den Namen der Wahlbezirke. Die andere Spalte `area_name.x` brauchen wir dann nicht mehr.
+`area_name.y` ist aktuell nur mit Landesnamen (plus Bund) gefüllt. 
+Ergänzen wir also die `NA`s mit den Namen der Wahlbezirke. 
+Die andere Spalte `area_name.x` brauchen wir dann nicht mehr.
 
 ```{r}
 d_str4 <- 
@@ -376,9 +427,11 @@ dim(d)
 
 316 ist eine gute Zahl: 
 
-- 299 Wahlbezirke
-- 16 Länder
+- 299 Wahlbezirke +
+- 16 Länder +
 - 1 Bund
+
+ergibt 316.
 
 
 ## Check
@@ -438,6 +491,11 @@ wahlkreise_shp %>%
   geom_sf()
 ```
 
+Hilfe zum Geom `sf` (simple feature) findet sich [hier](https://r-spatial.github.io/sf/).
+
+Man beachte die [Installationshinweise](https://r-spatial.github.io/sf/index.html#installing).
+
+
 Der Aufbau des Datensatzes ist aufgeräumt:
 
 ```{r}
@@ -489,7 +547,8 @@ d2 %>%
 
 
 
-Ein paar Wahlkreise haben entweder nicht erwischt, oder es gibt keine Daten.
+Ein paar Wahlkreise haben entweder nicht erwischt,
+oder es gibt keine Daten.
 
 
 ## Ausländeranteil
@@ -550,7 +609,8 @@ d2 %>%
 
 So kommen die Unterschiede optisch deutlich besser zum Tragen. 
 
-Zur Erinnerung: +1 auf der Log2-Skala entspricht einer Multiplikation mit 2 auf der Rohskala. Die Log2-Skala zählt also "Verdopplungsschritte".
+Zur Erinnerung: +1 auf der Log2-Skala entspricht einer Multiplikation mit 2 auf der Rohskala. 
+Die Log2-Skala zählt also "Verdopplungsschritte".
 
 
 # EDA
@@ -583,7 +643,7 @@ Allerdings ist dieser Zusammenhang deutlich stärker ausgeprägt für Cluster 1.
 
 ### Ausländeranteil nach Bundesland
 
-Wenn wir diese Analyse aufteilen nach Bundesländern, sehen wir viellicht klarer.
+Wenn wir diese Analyse aufteilen nach Bundesländern, sehen wir vielleicht klarer.
 
 
 
@@ -602,7 +662,8 @@ d2 %>%
 
 
 Es scheint sich in jedem Bundesland ein negativer, linearer Zusammenhang zu zeigen.
-Es sei denn, der AfD-Anteil ist sehr gering, dann wird der Zusammenhang schwach, also eine Bodeneffekt.
+Es sei denn, der AfD-Anteil ist sehr gering, 
+dann wird der Zusammenhang schwach, also eine Bodeneffekt.
 
 
 ## Bivariate Korrelationen
@@ -639,7 +700,8 @@ d2 %>%
   fmt_number(where(is.numeric), decimals = 2)
 ```
 
-Je mehr Ausländer, oder auch je mehr Einkommen, desto weniger wird AfD gewählt. Die Arbeitslosigkeit steht fast nicht in einem (linearen) Zusammenhang mit dem AfD-Wahlerfolg.
+Je mehr Ausländer, oder auch je mehr Einkommen, desto weniger wird AfD gewählt. 
+Die Arbeitslosigkeit steht fast nicht in einem (linearen) Zusammenhang mit dem AfD-Wahlerfolg.
 
 
 
@@ -653,8 +715,15 @@ Alle Prozessorkerne nutzen:
 options(mc.cores = parallel::detectCores())
 ```
 
+Die kompilierten Modelle auf die Hard Disk schreiben:
 
-Daten aufbereiten:
+```{r}
+rstan::rstan_options(auto_write = TRUE)
+```
+
+
+Daten aufbereiten, d.h. z-standardisieren:
+
 
 ```{r}
 d3 <-
@@ -667,26 +736,218 @@ d3 <-
 ```
 
 
-## Model 1
+Wir nutzen z-Werte als AV;
+das hat auch pragmatische Gründe: z-Werte sind kontinuierlich und unbegrenzt und daher angenehm mit linearen Modellen zu untersuchen.
+
+## Modellkaskade
+
+In der Forschungsfrage 2 untersuchen wir sozioökonomische Faktoren. 
+Diese werden in den ersten Modellen analysiert.
+
+Die Frage nach dem uniquen Erklärungsbeitrag der Bundesländer wird in Forschungsfrage 3 gestellt.
+Entsprechend werden Modelle aufgestellt, 
+die den spezifischen Erklärungsbeitrag der Bundesländer (hinsichtlich der AV) untersuchen.
+
+
+
+## Ergebnisobjekt
+
+
+In diesem Tibble (Dataframe, Tabelle) speichern wir zentrale Ergebnisse des Modells:
+
+```{r}
+results <-
+  tibble(
+    model_id = NA,
+    priors = "standard",
+    preds = NA,
+    r2 = NA,
+    r2_loo = NA,
+    coefs = NA
+  )
+```
+
+
+
+
+
+
+
+## Model 1: Arbeitslosigkeit
+
+In diesem Modell wird der AfD-Wahlerfolg auf die Arbeitslosigkeit zurückgeführt.
+
 
 ### Modell berechnen
 
-Modell berechnen:
+
+```{r m1}
+tic()
+m1 <- stan_glm(Prozent_z ~ unemp_z,
+               data = d3,
+               refresh = 0)
+toc()
+```
+
+
+### Ergebnis
 
 ```{r}
+m1
+```
+
+
+Oder kürzer:
+
+
+```{r}
+coef(m1)
+```
+
+
+
+Wie man sieht, spielt die Arbeitslosigkeit keine Rolle zur Erklärung des AfD-Wahlerfolgs.
+
+```{r}
+plot(m1)
+```
+
+
+
+```{r}
+mcmc_areas_ridges(m1,
+                  pars = "unemp_z")
+```
+
+Offensichtlich kann es nicht ausgeschlossen werden,
+dass die Arbeitslosigkeit unabhängig vom AfD-Wahlerfolg ist.
+
+
+#### R2
+
+```{r}
+m1_r2 <- bayes_R2(m1)
+```
+
+Erklärung zu dieser Funktion findet sich [hier](https://mc-stan.org/rstanarm/reference/bayes_R2.stanreg.html).
+
+
+
+### Modellprüfung
+
+#### PPV
+
+```{r}
+pp_check(m1)
+```
+
+Oh, unser Modell erklärt die Daten schlecht.
+
+
+```{r}
+tibble(
+  resid = resid(m1),
+  pred = predict(m1)
+) %>% 
+  ggplot() +
+  aes(x = pred, y = resid) +
+  geom_hline(yintercept = 0, linetype = "dotted") +
+  geom_point() +
+  geom_smooth()
+```
+
+
+Die Varianz ist nicht homogen über die Prädiktorwerte hinweg. 
+Außerdem finden sich Anzeichen eines nichtlinearen Trends.
+
+#### Kreuzvalidierung
+
+```{r}
+m1_loo_r2 <- loo_R2(m1)
+median(m1_loo_r2)
+```
+
+
+
+### Prioris
+
+```{r}
+prior_summary(m1)
+```
+
+```{r m1-prior-pd}
 tic()
-m1 <- 
-  stan_glm(Prozent_z ~ state + unemp_z + for_prop_z,
-               data = d3,
+m1_prior_pv <- stan_glm(Prozent_z ~ unemp_z,
+                        data = d3,
+                        prior_PD = TRUE,
+                        refresh = 0)
+toc()
+```
+
+
+Hinweise zu `prior_PD` finden sich [hier](https://mc-stan.org/rstanarm/reference/stan_glm.html).
+
+```{r}
+coef(m1_prior_pv)
+```
+
+```{r}
+plot(m1_prior_pv)
+```
+
+Die Prioris sehen vernünftig aus.
+
+
+
+
+### Fazit
+
+```{r}
+m1_results <-
+  tibble(
+    model_id = "m1",
+    priors = "standard",
+    preds = "unemp_z",
+    r2 = median(m1_r2),
+    r2_loo = median(m1_loo_r2),
+    coefs = list(coef(m1))
+  )
+```
+
+
+```{r}
+results <-
+  results %>% 
+  bind_rows(m1_results)
+```
+
+
+
+
+
+
+
+
+
+## Modell 2: Ausländeranteil
+
+
+### Modell berechnen (m2)
+
+```{r, m2}
+tic()
+m2 <- 
+  stan_glm(Prozent_z ~ for_prop_z,
+           data = d3,
            refresh = 0
            )
 toc()
 ```
 
-Modellergebnisse:
+### Ergebnis
 
 ```{r}
-m1
+m2
 ```
 
 
@@ -694,14 +955,527 @@ Modellparameter visualisieren:
 
 
 ```{r}
-plot(m1)
+plot(m2)
+```
+
+```{r}
+mcmc_areas(m2,
+           pars = "for_prop_z")
+```
+
+Der Ausländeranteil spielt laut unserem Modell eine große Rolle.
+
+
+#### R2
+
+```{r}
+m2_r2 <- bayes_R2(m2)
+median(m2_r2)
 ```
 
 
-### Modellergebnisse interpretieren
+### Modellprüfung
 
-Fast alle Modellparameter werden vom Modell als relevant angesehen - 
-mit Ausnahme des Koeffizienten für Mecklenburg-Vorpommern.
 
-Die stärksten Koeffizienten finden wir für Sachsen und Thüringen. 
-Das sind auch die Länder mit dem höchsten Wahlerfolg für die AfD.
+#### PPV
+
+```{r}
+pp_check(m2)
+```
+
+Unser Modell erklärt die Daten nicht gut.
+
+
+#### Kreuzvalidierung
+
+```{r}
+m2_loo_r2 <- loo_R2(m2)
+median(m2_loo_r2)
+```
+
+### Prioris
+
+
+
+```{r, m2-prior-PD}
+tic()
+m2_prior_pd <- 
+  stan_glm(Prozent_z ~ for_prop_z,
+           data = d3,
+           prior_PD = TRUE,
+           refresh = 0
+  )
+toc()
+```
+
+
+```{r}
+m2_prior_pd
+```
+
+
+```{r}
+plot(m2_prior_pd,
+      pars = "for_prop_z")
+```
+
+
+
+### Fazit
+
+```{r m2-results}
+m2_results <-
+  tibble(
+    model_id = "m2",
+    priors = "standard",
+    preds = "for_prop_z",
+    r2 = median(m2_r2),
+    r2_loo = median(m2_loo_r2),
+    coefs = list(coef(m2))
+  )
+```
+
+
+```{r}
+results <-
+  results %>% 
+  bind_rows(m2_results)
+```
+
+
+
+## Modell 3: Arbeitslosigkeit und Ausländeranteil
+
+
+### Modell berechnen (m3)
+
+
+
+```{r m3}
+tic()
+m3 <- 
+  stan_glm(Prozent_z ~ for_prop_z + unemp_z,
+           data = d3,
+           refresh = 0
+           )
+toc()
+```
+
+### Ergebnis
+
+```{r}
+m3
+```
+
+Interessant. 
+Zusätzlich zum Ausländeranteil spielt die Arbeitslosigkeit jetzt doch eine Rolle: 
+Es findet sich jetzt eine *positive* Assoziation mit der AV. 
+
+```{r}
+plot(m3, plotfun = "mcmc_dens")
+```
+
+
+Details zu `plot()` im Zusammenhang von `rstanarm` finden sich [hier](https://mc-stan.org/rstanarm/reference/plot.stanreg.html).
+
+
+#### R2
+
+```{r}
+m3_r2 <- bayes_R2(m3)
+median(m3_r2)
+```
+
+
+```{r}
+m3_loo_r2 <- loo_R2(m3)
+median(m3_loo_r2)
+```
+
+### Modellprüfung
+
+```{r}
+pp_check(m3)
+```
+
+Hm, auch dieses Modell erklärt die Daten nicht gut.
+
+
+
+
+### Fazit
+
+```{r m3-results}
+m3_results <-
+  tibble(
+    model_id = "m3",
+    priors = "standard",
+    preds = "unemp_z + for_prop_z",
+    r2 = median(m2_r2),
+    r2_loo = median(m2_loo_r2),
+    coefs = list(coef(m2))
+  )
+```
+
+
+```{r}
+results <-
+  results %>% 
+  bind_rows(m3_results)
+```
+
+
+
+
+
+
+
+
+
+
+## Modell 4: Bundesländer
+
+
+Frühere Analysen haben gezeigt, 
+dass die Bundesländer über sozioökonomische Faktoren hinaus eine hohe prädiktive Relevanz in den Modellen haben.
+
+
+### Modell berechnen (m4)
+
+
+
+
+```{r m4}
+tic()
+m4 <- 
+  stan_glm(Prozent_z ~ state,
+           data = d3,
+           refresh = 0
+           )
+toc()
+```
+
+### Ergebnis
+
+```{r}
+m4
+```
+
+
+```{r}
+plot(m4, regex_pars = "^state")
+```
+
+
+Sachsen und Thüringen haben die stärksten (absoluten und positiven) Koeffizienten.
+
+
+
+```{r}
+m4_r2 <- bayes_R2(m4)
+m4_r2_loo <- loo_R2(m4)
+```
+
+
+## Modell 5: Sachsen und Thüringen vs. Rest
+
+
+```{r}
+d4 <-
+  d3 %>% 
+  mutate(Sachsen_Thueringen = case_when(
+    state == "Sachsen" | state == "Thüringen" ~ 1,
+    TRUE ~ 0
+  )) %>% 
+  select(-state)
+```
+
+
+
+### Modell berechnen (m5)
+
+
+```{r m5}
+tic()
+m5 <- 
+  stan_glm(Prozent_z ~ Sachsen_Thueringen,
+           data = d4,
+           refresh = 0
+           )
+toc()
+```
+
+### Ergebnisse
+
+
+```{r}
+m5
+```
+
+```{r}
+plot(m5, pars = "Sachsen_Thueringen")
+```
+
+
+Das ist ein sehr starker Effekt.
+
+
+```{r}
+m5_r2 <- bayes_R2(m5)
+m5_r2_loo <- loo_R2(m5)
+```
+
+
+
+## Modell 6: Alle Prädiktoren
+
+### Modell berechnen (m6)
+
+```{r}
+tic()
+m6 <- 
+  stan_glm(Prozent_z ~ state + for_prop_z + unemp_z,
+           data = d3,
+           refresh = 0
+           )
+toc()
+```
+
+
+### Ergebnisse
+
+```{r}
+m6
+```
+
+```{r}
+m6_r2 <- bayes_R2(m6)
+m6_r2_loo <- loo_R2(m6)
+median(m6_r2_loo)
+```
+
+
+### Modellprüfung
+
+
+```{r}
+pp_check(m6)
+```
+
+
+Das Modell erklärt die Daten gut.
+
+
+## Modell 7: Ausländer, Arbeitslosigkeit, Sachsen-Thüringen
+
+### Modell berechnen (m7)
+
+```{r}
+tic()
+m7 <- 
+  stan_glm(Prozent_z ~ Sachsen_Thueringen + for_prop_z + unemp_z,
+           data = d4,
+           refresh = 0
+           )
+toc()
+```
+
+
+### Ergebnisse
+
+```{r}
+m7
+```
+
+```{r}
+m7_r2 <- bayes_R2(m7)
+m7_r2_loo <- loo_R2(m7)
+median(m7_r2_loo)
+```
+
+
+
+## Modell 8: Nur Sachsen-Thüringen
+
+### Modell berechnen (m8)
+
+```{r}
+tic()
+m8 <- 
+  stan_glm(Prozent_z ~ Sachsen_Thueringen,
+           data = d4,
+           refresh = 0
+           )
+toc()
+```
+
+
+### Ergebnisse
+
+```{r}
+m8
+```
+
+```{r}
+m8_r2 <- bayes_R2(m8)
+m8_r2_loo <- loo_R2(m8)
+median(m8_r2_loo)
+```
+
+
+
+
+## Modell 9: Sachsen-Thüringen und Ausländer
+
+
+
+### Modell berechnen (m8)
+
+```{r}
+tic()
+m9 <- 
+  stan_glm(Prozent_z ~ Sachsen_Thueringen + for_prop_z,
+           data = d4,
+           refresh = 0
+  )
+toc()
+```
+
+
+### Ergebnisse
+
+```{r}
+m9
+```
+
+```{r}
+m9_r2 <- bayes_R2(m9)
+m9_r2_loo <- loo_R2(m9)
+median(m9_r2_loo)
+```
+
+
+### Visualisierung
+
+Es lohnt sich vielleicht, dieses Modell zu visualisieren.
+
+```{r}
+m9_draws <-
+  m9 %>% 
+  as_tibble() %>% 
+  rename(intercept = `(Intercept)`) %>% 
+  dplyr::select(-sigma)
+```
+
+
+
+```{r}
+ggplot(d4) + 
+  aes(x = for_prop_z, y = Prozent_z) +
+  # Ungewissheit der Regressionsgeraden:
+  geom_abline(
+    aes(intercept = intercept, slope = for_prop_z),
+    data = sample_n(m9_draws, 100),
+    color = "grey60",
+    alpha = .15
+  ) +
+  # Mediane Schätzwerte für "die" Regressionsgerade:
+  geom_abline(
+    intercept = median(m9_draws$intercept),
+    slope = median(m9_draws$for_prop_z),
+    size = 1,
+    color = "blue"
+  ) +
+  geom_point()
+```
+
+
+
+
+## Modelle vergleichen
+
+```{r}
+loo_m1 <- loo(m1)
+loo_m2 <- loo(m2)
+loo_m3 <- loo(m3)
+loo_m4 <- loo(m4)
+loo_m5 <- loo(m5)
+loo_m6 <- loo(m6, k_threshold = 0.7)
+loo_m7 <- loo(m7)
+loo_m8 <- loo(m8)
+loo_m9 <- loo(m9)
+```
+
+
+
+
+```{r}
+loo_comparison <- 
+  loo_compare(
+    loo_m1,
+    loo_m2,
+    loo_m3,
+    loo_m4,
+    loo_m5,
+    loo_m6,
+    loo_m7,
+    loo_m8
+  )
+loo_comparison 
+```
+
+Bestes Modell:
+
+```{r}
+loo_min_model <-
+attr(loo_comparison, "dimnames")[[1]][1]
+
+loo_min_model
+```
+
+
+
+Hilfe zum Vergleich des LOO-Werte findet sich [hier](https://mc-stan.org/rstanarm/reference/loo.stanreg.html).
+
+Modell `r loo_min_model` tat sich als bestes Modell hervor.
+
+
+# Fazit
+
+## Fazit der Modellierung
+
+Modell `m7` kam als bestes Modell im Vergleich hervor.
+
+## Interpretation
+
+Zwar spielen die sozioökonomischen Kennwerte eine Rolle, 
+aber ein wichtiger Faktor zur Vorhersage des Wahlerfolg sind die Bundesländer. 
+Dabei sticht das Duo Thüringen-Sachsen hervor. 
+Diese beiden Bundesländer haben - über den Beitrag der sozioökonomischen Kennwerte hinaus - 
+einen besonders großen Beitrag zur Erklärung der AfD-Wahlergebnisse.
+
+Das Modell schickt uns damit gleichsam zurück an den Schreibtisch: 
+Wir brauchen eine Theorie, die erklären könnte, 
+warum gerade die Bundesländer und gerade bestimmte Bundesländer Informationen in sich bergen, 
+die den AfD-Wahlerfolg besonders gut erklären können.
+
+Die Frage nach dem "warum" ist eine kausale;
+wissenschaftliche (und sonstige!) Theorien sind zumeist an den kausalen Abhängigkeiten interessiert.
+Das hat auch praktische Gründe: 
+Nur, wenn man das "warum" kennt, 
+kann man Interventionen einleiten; 
+sonst wüsste man nicht, welche Interventionen bei welchen Variablen welchen
+Nutzen haben.
+
+
+## Ausblick
+
+
+In Mehrebenenmodell wäre noch ein sinnvolle Erweiterung.
+
+Ein [nützliches Tutorial findet sich hier](https://mc-stan.org/users/documentation/case-studies/tutorial_rstanarm.html).
+
+
+
+
+
