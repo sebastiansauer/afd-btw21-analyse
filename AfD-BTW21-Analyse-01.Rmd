@@ -34,6 +34,8 @@ editor_options:
 # Hintergrund
 
 
+## Relevanz des Themas
+
 Die Bundestagswahl ist ein zentrales Ereignis für die Öffentlichkeit in Deutschland. 
 In Anbetracht der hohen Relevanz dieses Ereignisses stellt sich die Frage, 
 welche Faktoren die Ursache (oder zumindest Prädiktoren) der Wahlentscheidungen der Bürgerinnen und Bürger sind. 
@@ -58,7 +60,7 @@ von (potenziell) hohem gesellschaftlichem Interesse.
 
 
 
-# Hinweise
+## Hinweise
 
 Ziel dieser Analyse ist es, 
 grundlegende Methoden der Datenanalyse für eine angewandte Forschungsfrage bzw. eine Forschungsfrage von allgemeinem Interesse, 
@@ -69,11 +71,11 @@ Es handelt sich um eine Analyse mit rein didaktischem Ziel.
 Es sind keinerlei politische Aussagen mit dieser Analyse verbunden.
 
 
-# Forschungsfragen
+## Forschungsfragen
 
 
 1. Bei der BTW 2021, wie groß ist der AfD-Stimmenanteil, 
-aggregiert pro Bundesland und Deutschlandweit? 
+aggregiert pro Bundesland und deutschlandweit? 
 Wie verteilt sich der Stimmenanteil der AfD?
 
 2. Wie hängt der Wahlerfolg der AfD mit sozioökonomischen Indikatoren wie Arbeitslosigkeitsquote und Ausländeranteil zusammen?
@@ -715,12 +717,13 @@ Alle Prozessorkerne nutzen:
 options(mc.cores = parallel::detectCores())
 ```
 
-Die kompilierten Modelle auf die Hard Disk schreiben:
+Die kompilierten Modelle auf die Hard Disk schreiben, das geht schneller, als jedes Mal neu zu berechnen:
 
 ```{r}
 rstan::rstan_options(auto_write = TRUE)
 ```
 
+Alternativ könnte man das Ergebnisobjekt, wie `m1` mit `save(m1, file = "m1.rda")` in eine Datei speichern.
 
 Daten aufbereiten, d.h. z-standardisieren:
 
