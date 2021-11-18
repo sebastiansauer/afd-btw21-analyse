@@ -88,9 +88,9 @@ sondern lediglich (statistische) Zusammenhänge.
 
 
 
-# Vorbereitung
 
-## R-Pakete
+
+# R-Pakete
 
 
 ```{r}
@@ -101,7 +101,7 @@ library(corrr)  # Korrelationsmatrizen
 library(gt)  # HTML Tabellen
 library(rstanarm)  # Bayes-Modellierung
 library(tictoc)  # Messung der Rechenzeit
-library(bayesplot)  # Visualisierung von Bays-Modellen
+library(bayesplot)  # Visualisierung von Bayes-Modellen
 ```
 
 
@@ -121,7 +121,7 @@ Die Variablennamen sind [hier](https://bundeswahlleiter.de/bundestagswahlen/2021
 
 
 
-```{r}
+```{r read-data}
 d_str_file <- "https://bundeswahlleiter.de/dam/jcr/b1d3fc4f-17eb-455f-a01c-a0bf32135c5d/btw21_strukturdaten.csv"
 
 d_str <- read_delim(d_str_file,
@@ -135,9 +135,9 @@ d_str <- read_delim(d_str_file,
 
 Hier sind die Namen der Spalten:
 
-```{r}
+```{r eval = TRUE}
 names(d_str)
-    ```
+```
 
 
 Es ist vielleicht praktisch, 
@@ -1419,7 +1419,8 @@ loo_comparison <-
     loo_m5,
     loo_m6,
     loo_m7,
-    loo_m8
+    loo_m8,
+    loo_m9
   )
 loo_comparison 
 ```
