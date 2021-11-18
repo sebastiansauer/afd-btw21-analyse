@@ -92,7 +92,17 @@ sondern lediglich (statistische) Zusammenhänge.
 
 
 
+
 # IT-Setup 
+
+
+## Dateien herunterladen
+
+Am einfachsten: Laden Sie den [Github-Projektordner](https://github.com/sebastiansauer/afd-btw21-analyse) für diesen Workshop herunter. 
+Dann haben sie gleich alle nötigen Dateien in der gleichen Struktur,
+wie in dieser Rmd-Datei aufgeführt.
+
+Wenn Sie auf den grünen Button ("Code") klicken, können Sie den ganzen Projektordner herunterladen.
 
 ## R-Pakete laden
 
@@ -109,6 +119,8 @@ library(rstanarm)  # Bayes-Modellierung
 library(tictoc)  # Messung der Rechenzeit
 library(bayesplot)  # Visualisierung von Bayes-Modellen
 ```
+
+
 
 ## Sonstige Vorbereitung
 
