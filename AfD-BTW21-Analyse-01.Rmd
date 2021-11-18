@@ -102,7 +102,8 @@ Am einfachsten: Laden Sie den [Github-Projektordner](https://github.com/sebastia
 Dann haben sie gleich alle nötigen Dateien in der gleichen Struktur,
 wie in dieser Rmd-Datei aufgeführt.
 
-Wenn Sie auf den grünen Button ("Code") klicken, können Sie den ganzen Projektordner herunterladen.
+Wenn Sie auf den grünen Button ("Code") klicken, 
+können Sie den ganzen Projektordner herunterladen.
 
 ## R-Pakete laden
 
@@ -526,11 +527,27 @@ Das sieht gut aus.
 
 Die Geodaten sind ebenfalls erhältlich beim [Bundeswahlleiter](https://bundeswahlleiter.de/bundestagswahlen/2021/wahlkreiseinteilung/downloads.html).
 
+
+
+
 Die Geodaten zur Visualisierung der Wahlkreise werden im sog. "Shape-Format" (.shp) geliefert.
+
+
+Ich habe diese Version (der Shapefile, also der Geo-Daten) verwendet: 
+"Geometrie der Wahlkreise im Koordinatensystem UTM32", generalisierte Shape-Datei.
+
+
 
 ```{r AfD-BTW21-Analyse-01-27}
 geo_file <- "data/btw21_geometrie_wahlkreise_shp/Geometrie_Wahlkreise_20DBT.shp"
 ```
+
+Achtung: Wenn Sie die Daten selber herunterladen, 
+passen Sie *Ihren* Pfad entsprechend in der Syntax oben an. 
+
+Bei mir gibt es einen Unterordner "data" in dem wiederum ein Unterordner "btw21_geometrie_wahlkreise_shp" existiert.
+Darin liegt eine Shape-Datei, auf die ich zugreife.
+
 
 
 Einlesen:
