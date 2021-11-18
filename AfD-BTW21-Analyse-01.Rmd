@@ -1,7 +1,7 @@
 ---
 title: "Analyse des AfD-Wahlerfolgs bei der Bundestagswahl 2021"
 author: "Sebastian Sauer"
-date: "Letztes Update: `r Sys.time()"
+date: "Letztes Update: `r Sys.time()`"
 dpi: 300
 output: 
   rmdformats::readthedown:
@@ -784,27 +784,44 @@ Allerdings ist dieser Zusammenhang deutlich stärker ausgeprägt für Cluster 1.
 d2a <- 
 d2 %>% 
   filter(Gebietsart == "Wahlkreis") %>% 
-  mutate(Thueringen_Sachsen = 
+  mutate(T_S_SA = 
            case_when(
              state == "Thüringen" |
-               state == "Sachsen" ~ 
-               TRUE,
+             state == "Sachsen" | 
+             state == "Sachsen-Anhalt" ~ TRUE,
              TRUE ~ FALSE
            ))
 
 d2a %>%   
-select(Prozent, for_prop, Thueringen_Sachsen) %>% 
+select(Prozent, for_prop, T_S_SA) %>% 
   ggplot() +
   aes(x = for_prop, 
       y = Prozent, 
-      color = Thueringen_Sachsen) +
+      color = T_S_SA) +
   geom_point(alpha = .7) 
 ```
 
 
+### Farben pro Bundesland
+
+
+```{r AfD-BTW21-Analyse-01-38c}
+d2 %>% 
+  filter(Gebietsart == "Wahlkreis") %>% 
+  ggplot() +
+  aes(x = for_prop, y = Prozent, color = state) +
+  geom_point(alpha = .7) +
+  geom_smooth()
+```
+
+
+Das sind (zu?) viele Farben.
+
+
+
 ### Ausländeranteil nach Bundesland
 
-Wenn wir diese Analyse aufteilen nach Bundesländern, sehen wir vielleicht klarer.
+Wenn wir diese Analyse aufteilen nach Bundesländern, sehen wir vielleicht klarer (?).
 
 
 
@@ -882,7 +899,9 @@ Die kompilierten Modelle auf die Hard Disk schreiben, das geht schneller, als je
 rstan::rstan_options(auto_write = TRUE)
 ```
 
-Alternativ könnte man das Ergebnisobjekt, wie `m1` mit `save(m1, file = "m1.rda")` in eine Datei speichern.
+Alternativ könnte man das Ergebnisobjekt, wie `m1` mit `save(m1, file = "m1.rda")` in eine Datei speichern (und mit `load("ma.rda")` wieder laden).
+
+## z-Standardisierung
 
 Daten aufbereiten, d.h. z-standardisieren:
 
