@@ -595,7 +595,7 @@ Jetzt haben wir drei Datensätze "gejoint" ("verheiratet"),
 also entsprechend passender Zeilen zusammengefügt.
 
 
-### Verheiratete Daten in einer Datei sichern
+## Verheiratete Daten in einer Datei sichern
 
 Als externe Datei sichern:
 
@@ -605,6 +605,7 @@ write_rds(d2, file = "objects/d2.rds")
 
 Wir speichern nicht als Tabelle, da die Geo-Daten ein komplexeres Format haben.
 Stattdessen speichern als "normal" (binäre) Datei im R eigenen RDS-Format.
+Das ist ein effizientes, platzsparendes Format.
 
 
 Sie können diese Daten dann so wieder in R importieren:
