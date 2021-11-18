@@ -189,7 +189,7 @@ write_csv(d_str2, file = "objects/d_str2.csv")
 
 Oder als Excel-Exitstrategie:
 
-```{r}
+```{r eval = FALSE}
 writexl::write_xlsx(d_str2, path = "objects/d_str2.xlsx")
 ```
 
@@ -216,6 +216,27 @@ elec_results <- read_delim(elec_results_file,
                     skip = 9
                     ) 
 ```
+
+Alternativ kann man die Datei selber herunterladen und im Verzeichnis der Rmd-Datei abspeichern. 
+Man kann als CSV-Datei oder als XLSX-Datei abspeichern und dann in R importieren.
+Etwas nervig ist, dass das deutsche Excel (im Standard) keine Standard-CSV erstellt.
+
+Hier nur bruchstückhaft dargestellt; so können Sie die Datendatei importieren:
+
+```{r eval = FALSE}
+elec_results <- read_csv("kerg2_aufbereitet.csv")
+elec_results <- read_csv2("kerg2_aufbereitet.csv")  # Deutsches Excel!
+elec_results <- readxl::read_xlsx("kerg2_aufbereitet.xslx")
+```
+
+
+`kerg2_aufbereitet.csv`  meint, Sie haben die ersten paar Zeilen selber gelöscht
+und insgesamt dafür gesorgt, dass es eine schöne, maschinenfreundliche Datendatei ist.
+
+Eine CSV-Datei, die mit dem deutschen Excel erstellt wurde, können Sie mit `read_csv2(dateiname)` einlesen.
+
+Achtung: Excel schreibt manchmal in Ihre CSV-Datei *auch ohne* dass Sie auf Speichern klicken!
+Fragen Sie mich nicht, warum Excel sich diese Freiheit nimmt.
 
 
 ### Daten aufbereiten
