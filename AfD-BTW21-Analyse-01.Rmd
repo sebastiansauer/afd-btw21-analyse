@@ -614,7 +614,18 @@ Sie können diese Daten dann so wieder in R importieren:
 d2 <- read_rds(file = "objects/d2.rds")
 ```
 
-Das ist hilfreich, falls Sie oben Probleme hatten, alle Daten zu joinen.
+[Hier](https://github.com/sebastiansauer/afd-btw21-analyse/blob/main/objects/d2.rds) finden Sie die Datei in unserem Repo.
+[Hier](https://github.com/sebastiansauer/afd-btw21-analyse/raw/main/objects/d2.rds) ist der Link zum direkten Download.
+
+Sie können auch das ganze Repo herunterladen, wie oben erwähnt.
+Oder geschickter, Sie nutzen Github Desktop, dann können Sie jeweils die Updates herunterladen (und ggf. hochladen).
+
+
+
+
+Dieses Vorgehen ist hilfreich, falls Sie oben Probleme hatten, alle Daten zu joinen. 
+In dem Fall importieren Sie (mit `read_rds()`) einfach den Datensatz `d2`.
+
 
 
 
