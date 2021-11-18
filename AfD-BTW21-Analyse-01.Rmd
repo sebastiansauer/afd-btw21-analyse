@@ -638,7 +638,19 @@ In dem Fall importieren Sie (mit `read_rds()`) einfach den Datensatz `d2`.
 d2 %>% 
   ggplot() +
   geom_sf(aes(fill = Prozent,
-              geometry = geometry))
+              geometry = geometry)) 
+```
+
+
+Andere [Farbpalette](https://spielmanlab.github.io/introverse/articles/color_fill_scales.html):
+
+
+```{r AfD-BTW21-Analyse-01-32a}
+d2 %>% 
+  ggplot() +
+  geom_sf(aes(fill = Prozent,
+              geometry = geometry)) +
+  scale_fill_distiller(palette = "Spectral")
 ```
 
 
@@ -658,6 +670,9 @@ d2 %>%
         fill = "Anteil AfD-Zweitstimmen") +
   theme(legend.position = "bottom")
 ```
+
+
+Oder probieren Sie mal bei der Farbpalette die Option `option = "inferno"`.
 
 
 
@@ -727,6 +742,13 @@ Zur Erinnerung: +1 auf der Log2-Skala entspricht einer Multiplikation mit 2 auf 
 Die Log2-Skala zählt also "Verdopplungsschritte".
 
 
+
+## Weiterführende Literatur
+
+Bei Sauer 2019 findet sich auch einiges zum Thema Geoplotting.
+
+
+
 # EDA
 
 
@@ -754,6 +776,31 @@ Vielleicht sehen wir eher zwei, unterschiedliche Cluster?
 Cluster 1 ist geprägt von hohem Ausländeranteil und Cluster 2 von geringem. 
 In beiden Clustern ist der Zusammenhang negativ. 
 Allerdings ist dieser Zusammenhang deutlich stärker ausgeprägt für Cluster 1.
+
+### Zwei Cluster identifizieren
+
+
+```{r}
+d2a <- 
+d2 %>% 
+  filter(Gebietsart == "Wahlkreis") %>% 
+  mutate(Thueringen_Sachsen = 
+           case_when(
+             state == "Thüringen" |
+               state == "Sachsen" ~ 
+               TRUE,
+             TRUE ~ FALSE
+           ))
+
+d2a %>%   
+select(Prozent, for_prop, Thueringen_Sachsen) %>% 
+  ggplot() +
+  aes(x = for_prop, 
+      y = Prozent, 
+      color = Thueringen_Sachsen) +
+  geom_point(alpha = .7) 
+```
+
 
 ### Ausländeranteil nach Bundesland
 
