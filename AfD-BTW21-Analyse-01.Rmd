@@ -275,7 +275,13 @@ Sichern wir diese Daten in eine Datei:
 write_csv(elec_results2, file = "objects/elec_results2.csv")
 ```
 
+Der Befehl könnte voraussetzen, dass der Ordner `objects` existiert.
+Alternativ können Sie auch einfach ins aktuelle Verzeichnis schreiben, das ist einfacher (aber nicht so aufgeräumt):
 
+
+```{r AfD-BTW21-Analyse-01-9a, eval = FALSE}
+write_csv(elec_results2, file = "elec_results2.csv")
+```
 
 
 # Einfache, univariate Ergebnisse
