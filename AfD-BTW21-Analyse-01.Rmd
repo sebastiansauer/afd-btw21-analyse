@@ -530,11 +530,11 @@ Die Geodaten sind ebenfalls erhältlich beim [Bundeswahlleiter](https://bundeswa
 
 
 
-Die Geodaten zur Visualisierung der Wahlkreise werden im sog. "Shape-Format" (.shp) geliefert.
+Die Geodaten zur Visualisierung der Wahlkreise werden im sog. "[Shape-Format](https://de.wikipedia.org/wiki/Shapefile" (.shp) geliefert.
 
 
 Ich habe diese Version (der Shapefile, also der Geo-Daten) verwendet: 
-"Geometrie der Wahlkreise im Koordinatensystem UTM32", generalisierte Shape-Datei.
+"Geometrie der Wahlkreise im [Koordinatensystem](https://de.wikipedia.org/wiki/Kartennetzentwurf) [UTM32](https://de.wikipedia.org/wiki/UTM-Koordinatensystem", [generalisierte](https://enterprise.arcgis.com/de/portal/10.5/use/shapefiles.htm) Shape-Datei.
 
 
 
@@ -589,6 +589,31 @@ d2 <-
   mutate(area_nr = as.integer(area_nr)) %>% 
   full_join(wahlkreise_shp, by = c("area_nr" = "WKR_NR"))
 ```
+
+
+Jetzt haben wir drei Datensätze "gejoint" ("verheiratet"), 
+also entsprechend passender Zeilen zusammengefügt.
+
+
+### Verheiratete Daten in einer Datei sichern
+
+Als externe Datei sichern:
+
+```{r}
+write_rds(d2, file = "objects/d2.rds")
+```
+
+Wir speichern nicht als Tabelle, da die Geo-Daten ein komplexeres Format haben.
+Stattdessen speichern als "normal" (binäre) Datei im R eigenen RDS-Format.
+
+
+Sie können diese Daten dann so wieder in R importieren:
+
+```{r eval = FALSE}
+d2 <- read_rds(file = "objects/d2.rds")
+```
+
+Das ist hilfreich, falls Sie oben Probleme hatten, alle Daten zu joinen.
 
 
 
