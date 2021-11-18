@@ -1,7 +1,7 @@
 ---
 title: "Analyse des AfD-Wahlerfolgs bei der Bundestagswahl 2021"
 author: "Sebastian Sauer"
-date: "11/12/2021"
+date: "Letztes Update: `r Sys.time()"
 dpi: 300
 output: 
   rmdformats::readthedown:
@@ -92,7 +92,11 @@ sondern lediglich (statistische) Zusammenhänge.
 
 
 
-# R-Pakete
+# IT-Setup 
+
+## R-Pakete laden
+
+Nicht vergessen, dass die R-Pakete installiert sein müssen.
 
 
 ```{r AfD-BTW21-Analyse-01-1}
@@ -104,6 +108,14 @@ library(gt)  # HTML Tabellen
 library(rstanarm)  # Bayes-Modellierung
 library(tictoc)  # Messung der Rechenzeit
 library(bayesplot)  # Visualisierung von Bayes-Modellen
+```
+
+## Sonstige Vorbereitung
+
+Anderes ggplot-Theme setzen:
+
+```{r}
+theme_set(theme_minimal())
 ```
 
 
