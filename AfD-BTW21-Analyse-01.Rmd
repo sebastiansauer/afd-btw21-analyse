@@ -187,6 +187,13 @@ write_csv(d_str2, file = "objects/d_str2.csv")
 ```
 
 
+Oder als Excel-Exitstrategie:
+
+```{r}
+writexl::write_xlsx(d_str2, path = "objects/d_str2.xlsx")
+```
+
+
 ## Wahlergebnisse
 
 ### Daten einlesen
@@ -815,7 +822,7 @@ Wie man sieht, spielt die Arbeitslosigkeit keine Rolle zur Erklärung des AfD-Wa
 plot(m1)
 ```
 
-
+Man kann sich auch andere Darstellungen der Posteriori-Verteilung zeigen lassen:
 
 ```{r AfD-BTW21-Analyse-01-50}
 mcmc_areas_ridges(m1,
@@ -865,6 +872,10 @@ Außerdem finden sich Anzeichen eines nichtlinearen Trends.
 
 #### Kreuzvalidierung
 
+LOO: "Leave-one-out Cross-validation".
+
+Mehr dazu [hier](https://statmodeling.stat.columbia.edu/2020/07/08/regression-and-other-stories-is-available/) oder [hier](https://link.springer.com/book/10.1007/978-1-0716-1418-1).
+
 ```{r AfD-BTW21-Analyse-01-54}
 m1_loo_r2 <- loo_R2(m1)
 median(m1_loo_r2)
@@ -900,6 +911,12 @@ plot(m1_prior_pv)
 
 Die Prioris sehen vernünftig aus.
 
+
+Vergleich der Priori-Verteilung mit der Post-Verteilung:
+
+```{r AfD-BTW21-Analyse-01-1-bis}
+posterior_vs_prior(m1)
+```
 
 
 
