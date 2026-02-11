@@ -779,6 +779,10 @@ Allerdings ist dieser Zusammenhang deutlich stärker ausgeprägt für Cluster 1.
 
 ### Zwei Cluster identifizieren
 
+Nach Analyse der univariaten Statistiken könnte man die Hypothese haben, dass Sachen, Thüringen oder Sachsen-Anhalt zum ersten "oberen" (oben-links im letzten Streudiagramm) gehören. 
+
+Schauen wir uns das näher an:
+
 
 ```{r}
 d2a <- 
@@ -801,6 +805,11 @@ select(Prozent, for_prop, T_S_SA) %>%
   geom_point(alpha = .7) 
 ```
 
+Das hat ganz gut geklappt; die beiden Cluster wurden leidlich identifiziert. 
+Sicherlich ist noch Luft nach oben.
+Und, natürlich, bleibt die Frage offen, 
+welche Eigenschaften jener Bundesländer dazu führt,
+dass sie ein Cluster bilden.
 
 ### Farben pro Bundesland
 
@@ -815,7 +824,10 @@ d2 %>%
 ```
 
 
+
 Das sind (zu?) viele Farben.
+Die Analyse bringt uns nicht wirklich weiter.
+
 
 
 
@@ -899,7 +911,7 @@ Die kompilierten Modelle auf die Hard Disk schreiben, das geht schneller, als je
 rstan::rstan_options(auto_write = TRUE)
 ```
 
-Alternativ könnte man das Ergebnisobjekt, wie `m1` mit `save(m1, file = "m1.rda")` in eine Datei speichern (und mit `load("ma.rda")` wieder laden).
+Alternativ könnte man das Ergebnisobjekt, wie `m1` mit `save(m1, file = "m1.rda")` in eine Datei speichern (und mit `load("m1.rda")` wieder laden).
 
 ## z-Standardisierung
 
@@ -970,6 +982,13 @@ m1 <- stan_glm(Prozent_z ~ unemp_z,
 toc()
 ```
 
+Speichern:
+
+```{r eval = TRUE}
+save(m1, file = "objects/m1.Rda")
+```
+
+
 
 ### Ergebnis
 
@@ -1008,7 +1027,11 @@ dass die Arbeitslosigkeit unabhängig vom AfD-Wahlerfolg ist.
 
 ```{r AfD-BTW21-Analyse-01-51}
 m1_r2 <- bayes_R2(m1)
+m1_r2_md <- median(m1_r2)
+m1_r2_md
 ```
+
+Puh, das Modell ist seehr schlecht. Es erklärt kaum mehr als ... nichts (0%).
 
 Erklärung zu dieser Funktion findet sich [hier](https://mc-stan.org/rstanarm/reference/bayes_R2.stanreg.html).
 
@@ -1093,6 +1116,12 @@ posterior_vs_prior(m1)
 
 ### Fazit
 
+Dieses Modell (`m1`) ist sehr schlecht.
+Wir müssen andere oder zusätzliche Prädiktoren bemühen.
+
+Speichern wir die Ergebnisse in unserem Ergebnisobjekt.
+
+
 ```{r AfD-BTW21-Analyse-01-58}
 m1_results <-
   tibble(
@@ -1134,6 +1163,12 @@ m2 <-
            )
 toc()
 ```
+
+
+```{r}
+save(m2, file = "objects/m2.Rda")
+```
+
 
 ### Ergebnis
 
@@ -1520,7 +1555,7 @@ median(m8_r2_loo)
 
 
 
-### Modell berechnen (m8)
+### Modell berechnen (m9)
 
 ```{r AfD-BTW21-Analyse-01-94}
 tic()
@@ -1530,6 +1565,11 @@ m9 <-
            refresh = 0
   )
 toc()
+```
+
+
+```{r}
+save(m9, file = "m9.Rda")
 ```
 
 
@@ -1577,6 +1617,21 @@ ggplot(d4) +
     size = 1,
     color = "blue"
   ) +
+  geom_abline(
+    intercept = median(intercept) +
+      median(Sachsen_Thueringen),
+    slope = median(for_prop_z),
+    data = sample_n(m9_draws, 100),
+    size = 1,
+    color = "red"
+  ) +
+  geom_abline(
+    intercept = median(m9_draws$intercept) +
+      median(m9_draws$Sachsen_Thueringen),
+    slope = median(m9_draws$for_prop_z),
+    size = 1,
+    color = "red"
+  ) +  
   geom_point()
 ```
 
